@@ -1,2 +1,3 @@
 yq
 rich
+python-dotenv
