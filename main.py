@@ -5,6 +5,8 @@ from rich import print as rprint
 import os
 from yaml.composer import ComposerError
 from dotenv import load_dotenv
+from natsort import natsorted
+from ruamel.yaml import YAML, composer
 
 rprint(f"Is .env loaded : {load_dotenv()}")
 
@@ -14,6 +16,7 @@ IS_DEBUG = True if os.getenv("DEBUG") == "True" else False
 
 ROOT_YAML_DIR = pathlib.Path("yaml_snips").resolve()
 ROOT_JSON_OUT_DIR = pathlib.Path("json_out").resolve()
+yaml_12 = YAML(typ="safe")
 
 
 def generate_json_from_yaml(yaml_file_path: pathlib.Path, json_out_dir: pathlib.Path):
@@ -25,7 +28,7 @@ def generate_json_from_yaml(yaml_file_path: pathlib.Path, json_out_dir: pathlib.
             (json_out_dir / json_file_name).open(mode="w"),
             default=str,
         )
-        rprint(f"Wrote {json_file_name} !")
+        rprint(f"Wrote {json_file_name} ")
     except ComposerError:
         rprint("Multi docs found in stream...")
         out = yaml.safe_load_all(yaml_file_path.read_text())
@@ -36,10 +39,15 @@ def generate_json_from_yaml(yaml_file_path: pathlib.Path, json_out_dir: pathlib.
                 (json_out_dir / json_file_name).open(mode="w"),
                 default=str,
             )
-            rprint(f"Wrote {json_file_name} !!!")
+            rprint(f"Wrote {json_file_name} ")
 
 
 def rprint_yaml_to_json(yaml_file_path: pathlib.Path):
+    """using spec v1.1
+
+    Args:
+        yaml_file_path (pathlib.Path): _description_
+    """
     try:
         out = yaml.safe_load(yaml_file_path.read_text())
         rprint(f"{yaml_file_path.stem}")
@@ -52,13 +60,32 @@ def rprint_yaml_to_json(yaml_file_path: pathlib.Path):
         rprint("--------------")
 
 
-if __name__ == "__main__":
-    file_path_list = list(ROOT_YAML_DIR.rglob("*.yaml"))
-    rprint(f"File(s) found : {len(file_path_list)}")
+def rprint_yaml_to_json_v2(yaml_file_path: pathlib.Path):
+    """using spec v1.2
 
+    Args:
+        yaml_file_path (pathlib.Path): _description_
+    """
+    try:
+        out = yaml_12.load(yaml_file_path.read_text())
+        rprint(f"{yaml_file_path.stem}")
+        rprint(out)
+        rprint("--------------")
+    except composer.ComposerError as e:
+        rprint("Multi docs found in stream...")
+        out = yaml_12.load_all(yaml_file_path.read_text())
+        rprint(list(out))
+        rprint("--------------")
+
+
+if __name__ == "__main__":
+    file_path_list = natsorted(list(ROOT_YAML_DIR.rglob("*.yaml")))
+    rprint(f"File(s) found : {len(file_path_list)}")
+    # rprint(file_path_list)
     if IS_DEBUG:
         for yaml_file_path in file_path_list:
             rprint_yaml_to_json(yaml_file_path)
+            # rprint_yaml_to_json_v2(yaml_file_path)
     else:
         for yaml_file_path in file_path_list:
             generate_json_from_yaml(yaml_file_path, ROOT_JSON_OUT_DIR)

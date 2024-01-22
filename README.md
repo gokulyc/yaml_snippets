@@ -1,3 +1,5 @@
 # yaml_snippets
 
-Reference : https://quickref.me/yaml.html  
+References : 
+1. https://quickref.me/yaml.html  
+2. https://learnxinyminutes.com/docs/yaml/
