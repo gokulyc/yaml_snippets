@@ -1,0 +1,7 @@
+name:
+  some_thing: &VAR_NAME foobar
+  other_thing: *VAR_NAME
+
+address:
+  full_name: *VAR_NAME
+  last_name: barfoo

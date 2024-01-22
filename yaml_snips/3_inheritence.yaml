@@ -1,0 +1,11 @@
+grand_parent:
+  parent: &defaults
+    a: 2
+    b: 3
+
+  child:
+    <<: *defaults
+    b: 4
+
+other_thing:
+  <<: *defaults

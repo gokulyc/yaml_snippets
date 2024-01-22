@@ -1,0 +1,12 @@
+values: &ref_li
+  - Will be
+  - reused below
+
+di: &ref_map
+    name: loremlipsum
+    id: xxxxxx
+
+other_values:
+  i_am_ref: *ref_li
+
+values_person: *ref_map
